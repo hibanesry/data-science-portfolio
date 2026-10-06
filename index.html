@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Tic Tac Toe</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        padding: 20px;
+    }
+
+    .game {
+        width: 420px;
+        max-width: 100%;
+
+        background: white;
+        padding: 25px;
+
+        border-radius: 20px;
+
+        box-shadow:
+            0 15px 40px rgba(0,0,0,0.25);
+
+        text-align: center;
+    }
+
+    h1 {
+        margin-top: 0;
+        color: #333;
+    }
+
+    .mode-buttons {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+
+    .mode-buttons button {
+        flex: 1;
+        padding: 10px;
+
+        border: none;
+        border-radius: 8px;
+
+        background: #ddd;
+        cursor: pointer;
+
+        font-weight: bold;
+    }
+
+    .mode-buttons button.active {
+        background: #667eea;
+        color: white;
+    }
+
+    .difficulty {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .difficulty button {
+        flex: 1;
+        padding: 8px;
+
+        border: none;
+        border-radius: 8px;
+
+        background: #eee;
+        cursor: pointer;
+
+        font-weight: bold;
+    }
+
+    .difficulty button.active {
+        background: #764ba2;
+        color: white;
+    }
+
+    .score {
+        display: flex;
+        justify-content: space-around;
+
+        margin-bottom: 15px;
+
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .board {
+        display: grid;
+
+        grid-template-columns: repeat(3, 1fr);
+
+        gap: 8px;
+
+        margin: 20px auto;
+
+        width: 330px;
+        max-width: 100%;
+    }
+
+    .cell {
+        aspect-ratio: 1;
+
+        background: #f0f0f0;
+
+        border: none;
+        border-radius: 12px;
+
+        font-size: 55px;
+        font-weight: bold;
+
+        cursor: pointer;
+
+        transition: 0.15s;
+    }
+
+    .cell:hover {
+        background: #e2e2e2;
+    }
+
+    .cell.x {
+        color: #e53935;
+    }
+
+    .cell.o {
+        color: #1976d2;
+    }
+
+    .status {
+        min-height: 30px;
+
+        font-size: 18px;
+        font-weight: bold;
+
+        color: #333;
+
+        margin-bottom: 15px;
+    }
+
+    .buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .buttons button {
+        flex: 1;
+
+        padding: 12px;
+
+        border: none;
+        border-radius: 10px;
+
+        color: white;
+
+        font-size: 15px;
+        font-weight: bold;
+
+        cursor: pointer;
+    }
+
+    #newRound {
+        background: #28a745;
+    }
+
+    #resetScore {
+        background: #dc3545;
+    }
+
+    .winner {
+        animation: win 0.5s infinite alternate;
+    }
+
+    @keyframes win {
+        from {
+            transform: scale(1);
+        }
+
+        to {
+            transform: scale(1.08);
+        }
+    }
+
+</style>
+</head>
+
+
+<body>
+
+<div class="game">
+
+    <h1>⭕ Tic Tac Toe ❌</h1>
+
+
+    <!-- GAME MODE -->
+
+    <div class="mode-buttons">
+
+        <button id="computerMode" class="active">
+            🤖 Computer
+        </button>
+
+        <button id="twoPlayerMode">
+            👥 2 Players
+        </button>
+
+    </div>
+
+
+    <!-- DIFFICULTY -->
+
+    <div class="difficulty">
+
+        <button data-level="easy" class="active">
+            Easy
+        </button>
+
+        <button data-level="medium">
+            Medium
+        </button>
+
+        <button data-level="hard">
+            Hard
+        </button>
+
+    </div>
+
+
+    <!-- SCORE -->
+
+    <div class="score">
+
+        <div>
+            ❌ X:
+            <span id="xScore">0</span>
+        </div>
+
+        <div>
+            ⭕ O:
+            <span id="oScore">0</span>
+        </div>
+
+        <div>
+            🤝 Draw:
+            <span id="drawScore">0</span>
+        </div>
+
+    </div>
+
+
+    <!-- STATUS -->
+
+    <div id="status" class="status">
+        Your turn — X
+    </div>
+
+
+    <!-- BOARD -->
+
+    <div class="board" id="board">
+
+        <button class="cell" data-index="0"></button>
+        <button class="cell" data-index="1"></button>
+        <button class="cell" data-index="2"></button>
+
+        <button class="cell" data-index="3"></button>
+        <button class="cell" data-index="4"></button>
+        <button class="cell" data-index="5"></button>
+
+        <button class="cell" data-index="6"></button>
+        <button class="cell" data-index="7"></button>
+        <button class="cell" data-index="8"></button>
+
+    </div>
+
+
+    <!-- BUTTONS -->
+
+    <div class="buttons">
+
+        <button id="newRound">
+            🔄 New Round
+        </button>
+
+        <button id="resetScore">
+            🗑️ Reset Score
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   GAME VARIABLES
+========================= */
+
+let board = [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+];
+
+let currentPlayer = "X";
+
+let gameOver = false;
+
+let vsComputer = true;
+
+let difficulty = "easy";
+
+
+let scores = {
+    X: 0,
+    O: 0,
+    draw: 0
+};
+
+
+/* =========================
+   ELEMENTS
+========================= */
+
+const cells =
+    document.querySelectorAll(".cell");
+
+const status =
+    document.getElementById("status");
+
+const xScore =
+    document.getElementById("xScore");
+
+const oScore =
+    document.getElementById("oScore");
+
+const drawScore =
+    document.getElementById("drawScore");
+
+
+/* =========================
+   WINNING COMBINATIONS
+========================= */
+
+const winningMoves = [
+
+    [0,1,2],
+    [3,4,5],
+    [6,7,8],
+
+    [0,3,6],
+    [1,4,7],
+    [2,5,8],
+
+    [0,4,8],
+    [2,4,6]
+
+];
+
+
+/* =========================
+   CELL CLICK
+========================= */
+
+cells.forEach(cell => {
+
+    cell.addEventListener("click", () => {
+
+        const index =
+            Number(cell.dataset.index);
+
+
+        /* Don't allow move */
+
+        if (
+            board[index] !== "" ||
+            gameOver
+        ) {
+            return;
+        }
+
+
+        /* Computer mode */
+
+        if (
+            vsComputer &&
+            currentPlayer === "O"
+        ) {
+            return;
+        }
+
+
+        makeMove(index);
+
+    });
+
+});
+
+
+/* =========================
+   MAKE MOVE
+========================= */
+
+function makeMove(index) {
+
+    board[index] = currentPlayer;
+
+    updateBoard();
+
+
+    const result = checkWinner();
+
+    if (result) {
+
+        finishGame(result);
+
+        return;
+
+    }
+
+
+    /* Switch player */
+
+    currentPlayer =
+        currentPlayer === "X"
+        ? "O"
+        : "X";
+
+
+    updateStatus();
+
+
+    /* Computer */
+
+    if (
+        vsComputer &&
+        currentPlayer === "O" &&
+        !gameOver
+    ) {
+
+        setTimeout(computerMove, 500);
+
+    }
+
+}
+
+
+/* =========================
+   UPDATE BOARD
+========================= */
+
+function updateBoard() {
+
+    cells.forEach((cell, index) => {
+
+        cell.textContent =
+            board[index];
+
+        cell.classList.remove(
+            "x",
+            "o"
+        );
+
+
+        if (board[index] === "X") {
+
+            cell.classList.add("x");
+
+        }
+
+        if (board[index] === "O") {
+
+            cell.classList.add("o");
+
+        }
+
+    });
+
+}
+
+
+/* =========================
+   CHECK WINNER
+========================= */
+
+function checkWinner() {
+
+    for (
+        const combination
+        of winningMoves
+    ) {
+
+        const [a,b,c] =
+            combination;
+
+
+        if (
+            board[a] !== "" &&
+            board[a] === board[b] &&
+            board[a] === board[c]
+        ) {
+
+            return {
+                winner: board[a],
+                combination: combination
+            };
+
+        }
+
+    }
+
+
+    /* Draw */
+
+    if (
+        board.every(
+            cell => cell !== ""
+        )
+    ) {
+
+        return {
+            winner: "draw"
+        };
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =========================
+   FINISH GAME
+========================= */
+
+function finishGame(result) {
+
+    gameOver = true;
+
+
+    if (
+        result.winner === "draw"
+    ) {
+
+        scores.draw++;
+
+        drawScore.textContent =
+            scores.draw;
+
+        status.textContent =
+            "🤝 It's a Draw!";
+
+        return;
+
+    }
+
+
+    scores[result.winner]++;
+
+    if (result.winner === "X") {
+
+        xScore.textContent =
+            scores.X;
+
+    } else {
+
+        oScore.textContent =
+            scores.O;
+
+    }
+
+
+    result.combination.forEach(index => {
+
+        cells[index]
+            .classList.add("winner");
+
+    });
+
+
+    if (
+        vsComputer &&
+        result.winner === "O"
+    ) {
+
+        status.textContent =
+            "🤖 Computer Wins!";
+
+    }
+
+    else {
+
+        status.textContent =
+            "🎉 Player " +
+            result.winner +
+            " Wins!";
+
+    }
+
+}
+
+
+/* =========================
+   STATUS
+========================= */
+
+function updateStatus() {
+
+    if (
+        vsComputer &&
+        currentPlayer === "X"
+    ) {
+
+        status.textContent =
+            "Your turn — X";
+
+    }
+
+    else if (
+        vsComputer &&
+        currentPlayer === "O"
+    ) {
+
+        status.textContent =
+            "🤖 Computer's turn";
+
+    }
+
+    else {
+
+        status.textContent =
+            "Player " +
+            currentPlayer +
+            "'s turn";
+
+    }
+
+}
+
+
+/* =========================
+   COMPUTER MOVE
+========================= */
+
+function computerMove() {
+
+    if (gameOver) {
+        return;
+    }
+
+
+    let move;
+
+
+    /* EASY */
+
+    if (
+        difficulty === "easy"
+    ) {
+
+        move =
+            randomMove();
+
+    }
+
+
+    /* MEDIUM */
+
+    else if (
+        difficulty === "medium"
+    ) {
+
+        move =
+            findWinningMove("O");
+
+
+        if (move === null) {
+
+            move =
+                findWinningMove("X");
+
+        }
+
+
+        if (move === null) {
+
+            move =
+                randomMove();
+
+        }
+
+    }
+
+
+    /* HARD */
+
+    else {
+
+        move =
+            bestMove();
+
+    }
+
+
+    makeMove(move);
+
+}
+
+
+/* =========================
+   RANDOM MOVE
+========================= */
+
+function randomMove() {
+
+    const empty =
+        board
+        .map((value,index) =>
+            value === ""
+            ? index
+            : null
+        )
+        .filter(
+            index => index !== null
+        );
+
+
+    return empty[
+        Math.floor(
+            Math.random() *
+            empty.length
+        )
+    ];
+
+}
+
+
+/* =========================
+   FIND WINNING MOVE
+========================= */
+
+function findWinningMove(player) {
+
+    for (let i = 0; i < 9; i++) {
+
+        if (board[i] === "") {
+
+            board[i] = player;
+
+            const result =
+                checkWinner();
+
+            board[i] = "";
+
+
+            if (
+                result &&
+                result.winner === player
+            ) {
+
+                return i;
+
+            }
+
+        }
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =========================
+   HARD MODE
+   MINIMAX
+========================= */
+
+function bestMove() {
+
+    let bestScore = -Infinity;
+
+    let move;
+
+
+    for (let i = 0; i < 9; i++) {
+
+        if (board[i] === "") {
+
+            board[i] = "O";
+
+            const score =
+                minimax(
+                    board,
+                    false
+                );
+
+            board[i] = "";
+
+
+            if (score > bestScore) {
+
+                bestScore = score;
+
+                move = i;
+
+            }
+
+        }
+
+    }
+
+
+    return move;
+
+}
+
+
+function minimax(
+    position,
+    isMaximizing
+) {
+
+    const result =
+        checkWinner();
+
+
+    if (result) {
+
+        if (
+            result.winner === "O"
+        ) {
+            return 10;
+        }
+
+        if (
+            result.winner === "X"
+        ) {
+            return -10;
+        }
+
+        return 0;
+
+    }
+
+
+    if (isMaximizing) {
+
+        let bestScore =
+            -Infinity;
+
+
+        for (let i = 0; i < 9; i++) {
+
+            if (position[i] === "") {
+
+                position[i] = "O";
+
+                const score =
+                    minimax(
+                        position,
+                        false
+                    );
+
+                position[i] = "";
+
+                bestScore =
+                    Math.max(
+                        bestScore,
+                        score
+                    );
+
+            }
+
+        }
+
+
+        return bestScore;
+
+    }
+
+
+    else {
+
+        let bestScore =
+            Infinity;
+
+
+        for (let i = 0; i < 9; i++) {
+
+            if (position[i] === "") {
+
+                position[i] = "X";
+
+                const score =
+                    minimax(
+                        position,
+                        true
+                    );
+
+                position[i] = "";
+
+                bestScore =
+                    Math.min(
+                        bestScore,
+                        score
+                    );
+
+            }
+
+        }
+
+
+        return bestScore;
+
+    }
+
+}
+
+
+/* =========================
+   NEW ROUND
+========================= */
+
+document
+.getElementById("newRound")
+.addEventListener(
+    "click",
+    newRound
+);
+
+
+function newRound() {
+
+    board = [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+    ];
+
+    currentPlayer = "X";
+
+    gameOver = false;
+
+
+    cells.forEach(cell => {
+
+        cell.textContent = "";
+
+        cell.classList.remove(
+            "x",
+            "o",
+            "winner"
+        );
+
+    });
+
+
+    updateStatus();
+
+}
+
+
+/* =========================
+   RESET SCORE
+========================= */
+
+document
+.getElementById("resetScore")
+.addEventListener(
+    "click",
+    () => {
+
+        scores.X = 0;
+        scores.O = 0;
+        scores.draw = 0;
+
+        xScore.textContent = "0";
+        oScore.textContent = "0";
+        drawScore.textContent = "0";
+
+        newRound();
+
+    }
+);
+
+
+/* =========================
+   GAME MODE
+========================= */
+
+document
+.getElementById("computerMode")
+.addEventListener(
+    "click",
+    () => {
+
+        vsComputer = true;
+
+        document
+        .getElementById("computerMode")
+        .classList.add("active");
+
+        document
+        .getElementById("twoPlayerMode")
+        .classList.remove("active");
+
+        newRound();
+
+    }
+);
+
+
+document
+.getElementById("twoPlayerMode")
+.addEventListener(
+    "click",
+    () => {
+
+        vsComputer = false;
+
+        document
+        .getElementById("twoPlayerMode")
+        .classList.add("active");
+
+        document
+        .getElementById("computerMode")
+        .classList.remove("active");
+
+        newRound();
+
+    }
+);
+
+
+/* =========================
+   DIFFICULTY
+========================= */
+
+document
+.querySelectorAll(
+    ".difficulty button"
+)
+.forEach(button => {
+
+    button.addEventListener(
+        "click",
+        () => {
+
+            document
+            .querySelectorAll(
+                ".difficulty button"
+            )
+            .forEach(btn =>
+                btn.classList.remove(
+                    "active"
+                )
+            );
+
+
+            button.classList.add(
+                "active"
+            );
+
+
+            difficulty =
+                button.dataset.level;
+
+            newRound();
+
+        }
+    );
+
+});
+
+
+/* =========================
+   START
+========================= */
+
+updateStatus();
+
+</script>
+
+</body>
+</html>
