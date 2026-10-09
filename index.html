@@ -3,1115 +3,162 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Tic Tac Toe</title>
-
+<title>Expense Tracker</title>
 <style>
-    * {
-        box-sizing: border-box;
-    }
-
-    body {
-        margin: 0;
-        min-height: 100vh;
-        font-family: Arial, sans-serif;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-        padding: 20px;
-    }
-
-    .game {
-        width: 420px;
-        max-width: 100%;
-
-        background: white;
-        padding: 25px;
-
-        border-radius: 20px;
-
-        box-shadow:
-            0 15px 40px rgba(0,0,0,0.25);
-
-        text-align: center;
-    }
-
-    h1 {
-        margin-top: 0;
-        color: #333;
-    }
-
-    .mode-buttons {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 15px;
-    }
-
-    .mode-buttons button {
-        flex: 1;
-        padding: 10px;
-
-        border: none;
-        border-radius: 8px;
-
-        background: #ddd;
-        cursor: pointer;
-
-        font-weight: bold;
-    }
-
-    .mode-buttons button.active {
-        background: #667eea;
-        color: white;
-    }
-
-    .difficulty {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 20px;
-    }
-
-    .difficulty button {
-        flex: 1;
-        padding: 8px;
-
-        border: none;
-        border-radius: 8px;
-
-        background: #eee;
-        cursor: pointer;
-
-        font-weight: bold;
-    }
-
-    .difficulty button.active {
-        background: #764ba2;
-        color: white;
-    }
-
-    .score {
-        display: flex;
-        justify-content: space-around;
-
-        margin-bottom: 15px;
-
-        font-size: 18px;
-        font-weight: bold;
-    }
-
-    .board {
-        display: grid;
-
-        grid-template-columns: repeat(3, 1fr);
-
-        gap: 8px;
-
-        margin: 20px auto;
-
-        width: 330px;
-        max-width: 100%;
-    }
-
-    .cell {
-        aspect-ratio: 1;
-
-        background: #f0f0f0;
-
-        border: none;
-        border-radius: 12px;
-
-        font-size: 55px;
-        font-weight: bold;
-
-        cursor: pointer;
-
-        transition: 0.15s;
-    }
-
-    .cell:hover {
-        background: #e2e2e2;
-    }
-
-    .cell.x {
-        color: #e53935;
-    }
-
-    .cell.o {
-        color: #1976d2;
-    }
-
-    .status {
-        min-height: 30px;
-
-        font-size: 18px;
-        font-weight: bold;
-
-        color: #333;
-
-        margin-bottom: 15px;
-    }
-
-    .buttons {
-        display: flex;
-        gap: 10px;
-    }
-
-    .buttons button {
-        flex: 1;
-
-        padding: 12px;
-
-        border: none;
-        border-radius: 10px;
-
-        color: white;
-
-        font-size: 15px;
-        font-weight: bold;
-
-        cursor: pointer;
-    }
-
-    #newRound {
-        background: #28a745;
-    }
-
-    #resetScore {
-        background: #dc3545;
-    }
-
-    .winner {
-        animation: win 0.5s infinite alternate;
-    }
-
-    @keyframes win {
-        from {
-            transform: scale(1);
-        }
-
-        to {
-            transform: scale(1.08);
-        }
-    }
-
+:root{--bg:#f4f7fb;--card:#fff;--ink:#172033;--muted:#667085;--line:#e3e8f0;--accent:#3157d5;--green:#16845b;--red:#d63d52}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+main{width:min(100% - 28px,900px);margin:28px auto}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+h1{margin:0;font-size:clamp(25px,4vw,34px)}.subtitle{color:var(--muted);margin:7px 0 0}
+.currency{font-size:13px;color:var(--muted)}
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 4px 15px #17203308}
+.card .label{color:var(--muted);font-size:13px;margin-bottom:8px}.amount{font-size:clamp(19px,3vw,27px);font-weight:800;overflow-wrap:anywhere}
+.income{color:var(--green)}.expense{color:var(--red)}
+.layout{display:grid;grid-template-columns:minmax(0, .85fr) minmax(0,1.15fr);gap:16px}
+h2{font-size:19px;margin:0 0 16px}
+label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
+input,select{width:100%;padding:12px;border:1px solid #cfd6e2;border-radius:9px;background:#fff;color:var(--ink);font:inherit;min-width:0}
+input:focus,select:focus,button:focus-visible{outline:3px solid #aabaff;outline-offset:1px}
+.type-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.type-option{display:flex;align-items:center;gap:8px;padding:10px;border:1px solid var(--line);border-radius:9px;font-size:14px}
+.type-option input{width:auto}
+.primary{width:100%;margin-top:16px;background:var(--accent);color:#fff;border:0;border-radius:10px;padding:13px;font-weight:700;font-size:15px;cursor:pointer}
+.secondary{background:#eef2ff;color:#263f9d;border:0;border-radius:8px;padding:9px 11px;cursor:pointer;font-weight:700}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
+.transactions{display:grid;gap:9px}
+.transaction{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:11px}
+.dot{width:11px;height:11px;border-radius:50%;flex:none}.tx-main{min-width:0;flex:1;text-align:left}.tx-title{font-weight:700;overflow-wrap:anywhere}.tx-meta{font-size:12px;color:var(--muted);margin-top:4px}
+.tx-right{text-align:right;flex:none}.tx-amount{font-weight:800}.delete{display:block;margin:5px 0 0 auto;background:transparent;color:var(--red);border:0;padding:3px;cursor:pointer;font-size:12px}
+.empty{text-align:center;padding:24px 8px;color:var(--muted);border:1px dashed #cfd6e2;border-radius:11px}
+.footer{color:var(--muted);font-size:12px;text-align:center;margin:18px 0}
+@media(max-width:680px){main{margin:18px auto}.summary{gap:7px}.card{padding:12px}.layout{grid-template-columns:1fr}.summary .label{font-size:11px}.filters{grid-template-columns:1fr 1fr}}
+@media(max-width:390px){.summary{grid-template-columns:1fr}.summary .card{padding:14px}}
 </style>
 </head>
-
-
 <body>
+<main>
+<header>
+  <div><h1>💰 Expense Tracker</h1><p class="subtitle">A simple place to track your money.</p></div>
+  <div class="currency">Currency: Indian Rupees (₹)</div>
+</header>
 
-<div class="game">
+<section class="summary" aria-label="Financial summary">
+  <div class="card"><div class="label">Total Income</div><div id="totalIncome" class="amount income">₹0.00</div></div>
+  <div class="card"><div class="label">Total Expenses</div><div id="totalExpense" class="amount expense">₹0.00</div></div>
+  <div class="card"><div class="label">Balance</div><div id="balance" class="amount">₹0.00</div></div>
+</section>
 
-    <h1>⭕ Tic Tac Toe ❌</h1>
-
-
-    <!-- GAME MODE -->
-
-    <div class="mode-buttons">
-
-        <button id="computerMode" class="active">
-            🤖 Computer
-        </button>
-
-        <button id="twoPlayerMode">
-            👥 2 Players
-        </button>
-
+<div class="layout">
+<section class="card">
+  <h2>Add a transaction</h2>
+  <form id="transactionForm">
+    <label for="title">Description</label>
+    <input id="title" name="title" maxlength="70" placeholder="e.g. Lunch, Salary" required>
+    <label for="amount">Amount (₹)</label>
+    <input id="amount" name="amount" type="number" min="0.01" max="100000000" step="0.01" placeholder="e.g. 250" required>
+    <label>Transaction type</label>
+    <div class="type-row">
+      <label class="type-option"><input type="radio" name="type" value="income"> Income</label>
+      <label class="type-option"><input type="radio" name="type" value="expense" checked> Expense</label>
     </div>
+    <label for="category">Category</label>
+    <select id="category" name="category">
+      <option>Food</option><option>Travel</option><option>Shopping</option><option>Bills</option><option>Salary</option><option>Education</option><option>Health</option><option>Other</option>
+    </select>
+    <label for="date">Date</label>
+    <input id="date" name="date" type="date" required>
+    <button class="primary" type="submit">+ Add transaction</button>
+  </form>
+</section>
 
-
-    <!-- DIFFICULTY -->
-
-    <div class="difficulty">
-
-        <button data-level="easy" class="active">
-            Easy
-        </button>
-
-        <button data-level="medium">
-            Medium
-        </button>
-
-        <button data-level="hard">
-            Hard
-        </button>
-
-    </div>
-
-
-    <!-- SCORE -->
-
-    <div class="score">
-
-        <div>
-            ❌ X:
-            <span id="xScore">0</span>
-        </div>
-
-        <div>
-            ⭕ O:
-            <span id="oScore">0</span>
-        </div>
-
-        <div>
-            🤝 Draw:
-            <span id="drawScore">0</span>
-        </div>
-
-    </div>
-
-
-    <!-- STATUS -->
-
-    <div id="status" class="status">
-        Your turn — X
-    </div>
-
-
-    <!-- BOARD -->
-
-    <div class="board" id="board">
-
-        <button class="cell" data-index="0"></button>
-        <button class="cell" data-index="1"></button>
-        <button class="cell" data-index="2"></button>
-
-        <button class="cell" data-index="3"></button>
-        <button class="cell" data-index="4"></button>
-        <button class="cell" data-index="5"></button>
-
-        <button class="cell" data-index="6"></button>
-        <button class="cell" data-index="7"></button>
-        <button class="cell" data-index="8"></button>
-
-    </div>
-
-
-    <!-- BUTTONS -->
-
-    <div class="buttons">
-
-        <button id="newRound">
-            🔄 New Round
-        </button>
-
-        <button id="resetScore">
-            🗑️ Reset Score
-        </button>
-
-    </div>
-
+<section class="card">
+  <h2>Transactions</h2>
+  <div class="filters">
+    <input id="search" type="search" placeholder="Search transactions…" aria-label="Search transactions">
+    <select id="filterType" aria-label="Filter transaction type"><option value="all">All types</option><option value="income">Income only</option><option value="expense">Expenses only</option></select>
+  </div>
+  <div id="transactions" class="transactions"><div class="empty">No transactions yet. Add your first one.</div></div>
+  <button id="clearAll" class="secondary" type="button" style="margin-top:12px">Clear all transactions</button>
+</section>
 </div>
-
-
+<p class="footer">Demo project · Data is saved in this browser on this device.</p>
+</main>
 <script>
-
-/* =========================
-   GAME VARIABLES
-========================= */
-
-let board = [
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    ""
-];
-
-let currentPlayer = "X";
-
-let gameOver = false;
-
-let vsComputer = true;
-
-let difficulty = "easy";
-
-
-let scores = {
-    X: 0,
-    O: 0,
-    draw: 0
-};
-
-
-/* =========================
-   ELEMENTS
-========================= */
-
-const cells =
-    document.querySelectorAll(".cell");
-
-const status =
-    document.getElementById("status");
-
-const xScore =
-    document.getElementById("xScore");
-
-const oScore =
-    document.getElementById("oScore");
-
-const drawScore =
-    document.getElementById("drawScore");
-
-
-/* =========================
-   WINNING COMBINATIONS
-========================= */
-
-const winningMoves = [
-
-    [0,1,2],
-    [3,4,5],
-    [6,7,8],
-
-    [0,3,6],
-    [1,4,7],
-    [2,5,8],
-
-    [0,4,8],
-    [2,4,6]
-
-];
-
-
-/* =========================
-   CELL CLICK
-========================= */
-
-cells.forEach(cell => {
-
-    cell.addEventListener("click", () => {
-
-        const index =
-            Number(cell.dataset.index);
-
-
-        /* Don't allow move */
-
-        if (
-            board[index] !== "" ||
-            gameOver
-        ) {
-            return;
-        }
-
-
-        /* Computer mode */
-
-        if (
-            vsComputer &&
-            currentPlayer === "O"
-        ) {
-            return;
-        }
-
-
-        makeMove(index);
-
-    });
-
+(() => {
+const STORAGE_KEY='expenseTrackerTransactionsV1';
+const form=document.getElementById('transactionForm');
+const titleInput=document.getElementById('title');
+const amountInput=document.getElementById('amount');
+const typeInputs=[...document.querySelectorAll('input[name="type"]')];
+const categoryInput=document.getElementById('category');
+const dateInput=document.getElementById('date');
+const transactionsEl=document.getElementById('transactions');
+const searchInput=document.getElementById('search');
+const filterType=document.getElementById('filterType');
+let transactions=[];
+const today=new Date();
+dateInput.value=[today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');
+function load(){
+ try{
+  const raw=localStorage.getItem(STORAGE_KEY);
+  const parsed=raw?JSON.parse(raw):[];
+  transactions=Array.isArray(parsed)?parsed.filter(t=>t&&typeof t.id==='string'&&typeof t.title==='string'&&Number.isFinite(Number(t.amount))&&['income','expense'].includes(t.type)):[];
+ }catch(e){transactions=[]}
+}
+function save(){
+ try{localStorage.setItem(STORAGE_KEY,JSON.stringify(transactions))}
+ catch(e){alert('Could not save in this browser. You can still use this page, but data may not persist.')}
+}
+function money(n){return new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',minimumFractionDigits:2}).format(n)}
+function renderSummary(){
+ const income=transactions.filter(t=>t.type==='income').reduce((s,t)=>s+Number(t.amount),0);
+ const expense=transactions.filter(t=>t.type==='expense').reduce((s,t)=>s+Number(t.amount),0);
+ document.getElementById('totalIncome').textContent=money(income);
+ document.getElementById('totalExpense').textContent=money(expense);
+ const bal=income-expense, balanceEl=document.getElementById('balance');
+ balanceEl.textContent=money(bal);balanceEl.className='amount '+(bal<0?'expense':'income');
+}
+function renderTransactions(){
+ const query=searchInput.value.trim().toLowerCase(), kind=filterType.value;
+ const visible=transactions.filter(t=>(kind==='all'||t.type===kind)&&[t.title,t.category,t.date,t.type].some(v=>String(v).toLowerCase().includes(query)));
+ transactionsEl.replaceChildren();
+ if(!visible.length){
+  const empty=document.createElement('div');empty.className='empty';empty.textContent=transactions.length?'No matching transactions.':'No transactions yet. Add your first one.';transactionsEl.appendChild(empty);return;
+ }
+ [...visible].sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id)).forEach(t=>{
+  const row=document.createElement('article');row.className='transaction';
+  const dot=document.createElement('span');dot.className='dot';dot.style.background=t.type==='income'?'var(--green)':'var(--red)';
+  const main=document.createElement('div');main.className='tx-main';
+  const name=document.createElement('div');name.className='tx-title';name.textContent=t.title;
+  const meta=document.createElement('div');meta.className='tx-meta';meta.textContent=t.category+' · '+t.date+' · '+(t.type==='income'?'Income':'Expense');
+  main.append(name,meta);
+  const right=document.createElement('div');right.className='tx-right';
+  const amount=document.createElement('div');amount.className='tx-amount '+(t.type==='income'?'income':'expense');amount.textContent=(t.type==='income'?'+':'−')+money(Number(t.amount));
+  const del=document.createElement('button');del.className='delete';del.type='button';del.textContent='Delete';del.setAttribute('aria-label','Delete '+t.title);
+  del.addEventListener('click',()=>{transactions=transactions.filter(x=>x.id!==t.id);save();render()});
+  right.append(amount,del);row.append(dot,main,right);transactionsEl.appendChild(row);
+ });
+}
+function render(){renderSummary();renderTransactions()}
+form.addEventListener('submit',e=>{
+ e.preventDefault();
+ const title=titleInput.value.trim(), amount=Number(amountInput.value), type=typeInputs.find(i=>i.checked)?.value||'expense', date=dateInput.value;
+ if(!title){alert('Please enter a description.');titleInput.focus();return}
+ if(!Number.isFinite(amount)||amount<=0){alert('Enter an amount greater than ₹0.');amountInput.focus();return}
+ if(!date){alert('Please choose a date.');dateInput.focus();return}
+ transactions.push({id:(Date.now().toString(36)+Math.random().toString(36).slice(2,8)),title,amount,type,category:categoryInput.value,date});
+ save();form.reset();typeInputs.find(i=>i.value==='expense').checked=true;dateInput.value=date;render();titleInput.focus();
 });
-
-
-/* =========================
-   MAKE MOVE
-========================= */
-
-function makeMove(index) {
-
-    board[index] = currentPlayer;
-
-    updateBoard();
-
-
-    const result = checkWinner();
-
-    if (result) {
-
-        finishGame(result);
-
-        return;
-
-    }
-
-
-    /* Switch player */
-
-    currentPlayer =
-        currentPlayer === "X"
-        ? "O"
-        : "X";
-
-
-    updateStatus();
-
-
-    /* Computer */
-
-    if (
-        vsComputer &&
-        currentPlayer === "O" &&
-        !gameOver
-    ) {
-
-        setTimeout(computerMove, 500);
-
-    }
-
-}
-
-
-/* =========================
-   UPDATE BOARD
-========================= */
-
-function updateBoard() {
-
-    cells.forEach((cell, index) => {
-
-        cell.textContent =
-            board[index];
-
-        cell.classList.remove(
-            "x",
-            "o"
-        );
-
-
-        if (board[index] === "X") {
-
-            cell.classList.add("x");
-
-        }
-
-        if (board[index] === "O") {
-
-            cell.classList.add("o");
-
-        }
-
-    });
-
-}
-
-
-/* =========================
-   CHECK WINNER
-========================= */
-
-function checkWinner() {
-
-    for (
-        const combination
-        of winningMoves
-    ) {
-
-        const [a,b,c] =
-            combination;
-
-
-        if (
-            board[a] !== "" &&
-            board[a] === board[b] &&
-            board[a] === board[c]
-        ) {
-
-            return {
-                winner: board[a],
-                combination: combination
-            };
-
-        }
-
-    }
-
-
-    /* Draw */
-
-    if (
-        board.every(
-            cell => cell !== ""
-        )
-    ) {
-
-        return {
-            winner: "draw"
-        };
-
-    }
-
-
-    return null;
-
-}
-
-
-/* =========================
-   FINISH GAME
-========================= */
-
-function finishGame(result) {
-
-    gameOver = true;
-
-
-    if (
-        result.winner === "draw"
-    ) {
-
-        scores.draw++;
-
-        drawScore.textContent =
-            scores.draw;
-
-        status.textContent =
-            "🤝 It's a Draw!";
-
-        return;
-
-    }
-
-
-    scores[result.winner]++;
-
-    if (result.winner === "X") {
-
-        xScore.textContent =
-            scores.X;
-
-    } else {
-
-        oScore.textContent =
-            scores.O;
-
-    }
-
-
-    result.combination.forEach(index => {
-
-        cells[index]
-            .classList.add("winner");
-
-    });
-
-
-    if (
-        vsComputer &&
-        result.winner === "O"
-    ) {
-
-        status.textContent =
-            "🤖 Computer Wins!";
-
-    }
-
-    else {
-
-        status.textContent =
-            "🎉 Player " +
-            result.winner +
-            " Wins!";
-
-    }
-
-}
-
-
-/* =========================
-   STATUS
-========================= */
-
-function updateStatus() {
-
-    if (
-        vsComputer &&
-        currentPlayer === "X"
-    ) {
-
-        status.textContent =
-            "Your turn — X";
-
-    }
-
-    else if (
-        vsComputer &&
-        currentPlayer === "O"
-    ) {
-
-        status.textContent =
-            "🤖 Computer's turn";
-
-    }
-
-    else {
-
-        status.textContent =
-            "Player " +
-            currentPlayer +
-            "'s turn";
-
-    }
-
-}
-
-
-/* =========================
-   COMPUTER MOVE
-========================= */
-
-function computerMove() {
-
-    if (gameOver) {
-        return;
-    }
-
-
-    let move;
-
-
-    /* EASY */
-
-    if (
-        difficulty === "easy"
-    ) {
-
-        move =
-            randomMove();
-
-    }
-
-
-    /* MEDIUM */
-
-    else if (
-        difficulty === "medium"
-    ) {
-
-        move =
-            findWinningMove("O");
-
-
-        if (move === null) {
-
-            move =
-                findWinningMove("X");
-
-        }
-
-
-        if (move === null) {
-
-            move =
-                randomMove();
-
-        }
-
-    }
-
-
-    /* HARD */
-
-    else {
-
-        move =
-            bestMove();
-
-    }
-
-
-    makeMove(move);
-
-}
-
-
-/* =========================
-   RANDOM MOVE
-========================= */
-
-function randomMove() {
-
-    const empty =
-        board
-        .map((value,index) =>
-            value === ""
-            ? index
-            : null
-        )
-        .filter(
-            index => index !== null
-        );
-
-
-    return empty[
-        Math.floor(
-            Math.random() *
-            empty.length
-        )
-    ];
-
-}
-
-
-/* =========================
-   FIND WINNING MOVE
-========================= */
-
-function findWinningMove(player) {
-
-    for (let i = 0; i < 9; i++) {
-
-        if (board[i] === "") {
-
-            board[i] = player;
-
-            const result =
-                checkWinner();
-
-            board[i] = "";
-
-
-            if (
-                result &&
-                result.winner === player
-            ) {
-
-                return i;
-
-            }
-
-        }
-
-    }
-
-
-    return null;
-
-}
-
-
-/* =========================
-   HARD MODE
-   MINIMAX
-========================= */
-
-function bestMove() {
-
-    let bestScore = -Infinity;
-
-    let move;
-
-
-    for (let i = 0; i < 9; i++) {
-
-        if (board[i] === "") {
-
-            board[i] = "O";
-
-            const score =
-                minimax(
-                    board,
-                    false
-                );
-
-            board[i] = "";
-
-
-            if (score > bestScore) {
-
-                bestScore = score;
-
-                move = i;
-
-            }
-
-        }
-
-    }
-
-
-    return move;
-
-}
-
-
-function minimax(
-    position,
-    isMaximizing
-) {
-
-    const result =
-        checkWinner();
-
-
-    if (result) {
-
-        if (
-            result.winner === "O"
-        ) {
-            return 10;
-        }
-
-        if (
-            result.winner === "X"
-        ) {
-            return -10;
-        }
-
-        return 0;
-
-    }
-
-
-    if (isMaximizing) {
-
-        let bestScore =
-            -Infinity;
-
-
-        for (let i = 0; i < 9; i++) {
-
-            if (position[i] === "") {
-
-                position[i] = "O";
-
-                const score =
-                    minimax(
-                        position,
-                        false
-                    );
-
-                position[i] = "";
-
-                bestScore =
-                    Math.max(
-                        bestScore,
-                        score
-                    );
-
-            }
-
-        }
-
-
-        return bestScore;
-
-    }
-
-
-    else {
-
-        let bestScore =
-            Infinity;
-
-
-        for (let i = 0; i < 9; i++) {
-
-            if (position[i] === "") {
-
-                position[i] = "X";
-
-                const score =
-                    minimax(
-                        position,
-                        true
-                    );
-
-                position[i] = "";
-
-                bestScore =
-                    Math.min(
-                        bestScore,
-                        score
-                    );
-
-            }
-
-        }
-
-
-        return bestScore;
-
-    }
-
-}
-
-
-/* =========================
-   NEW ROUND
-========================= */
-
-document
-.getElementById("newRound")
-.addEventListener(
-    "click",
-    newRound
-);
-
-
-function newRound() {
-
-    board = [
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        ""
-    ];
-
-    currentPlayer = "X";
-
-    gameOver = false;
-
-
-    cells.forEach(cell => {
-
-        cell.textContent = "";
-
-        cell.classList.remove(
-            "x",
-            "o",
-            "winner"
-        );
-
-    });
-
-
-    updateStatus();
-
-}
-
-
-/* =========================
-   RESET SCORE
-========================= */
-
-document
-.getElementById("resetScore")
-.addEventListener(
-    "click",
-    () => {
-
-        scores.X = 0;
-        scores.O = 0;
-        scores.draw = 0;
-
-        xScore.textContent = "0";
-        oScore.textContent = "0";
-        drawScore.textContent = "0";
-
-        newRound();
-
-    }
-);
-
-
-/* =========================
-   GAME MODE
-========================= */
-
-document
-.getElementById("computerMode")
-.addEventListener(
-    "click",
-    () => {
-
-        vsComputer = true;
-
-        document
-        .getElementById("computerMode")
-        .classList.add("active");
-
-        document
-        .getElementById("twoPlayerMode")
-        .classList.remove("active");
-
-        newRound();
-
-    }
-);
-
-
-document
-.getElementById("twoPlayerMode")
-.addEventListener(
-    "click",
-    () => {
-
-        vsComputer = false;
-
-        document
-        .getElementById("twoPlayerMode")
-        .classList.add("active");
-
-        document
-        .getElementById("computerMode")
-        .classList.remove("active");
-
-        newRound();
-
-    }
-);
-
-
-/* =========================
-   DIFFICULTY
-========================= */
-
-document
-.querySelectorAll(
-    ".difficulty button"
-)
-.forEach(button => {
-
-    button.addEventListener(
-        "click",
-        () => {
-
-            document
-            .querySelectorAll(
-                ".difficulty button"
-            )
-            .forEach(btn =>
-                btn.classList.remove(
-                    "active"
-                )
-            );
-
-
-            button.classList.add(
-                "active"
-            );
-
-
-            difficulty =
-                button.dataset.level;
-
-            newRound();
-
-        }
-    );
-
+searchInput.addEventListener('input',renderTransactions);
+filterType.addEventListener('change',renderTransactions);
+document.getElementById('clearAll').addEventListener('click',()=>{
+ if(!transactions.length){alert('There are no transactions to clear.');return}
+ if(confirm('Delete all transactions? This cannot be undone.')){transactions=[];save();render()}
 });
-
-
-/* =========================
-   START
-========================= */
-
-updateStatus();
-
+load();render();
+})();
 </script>
-
 </body>
 </html>
