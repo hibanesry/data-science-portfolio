@@ -1,0 +1,267 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Performance Analyzer</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+    }
+
+    header {
+      background: #1e3a8a;
+      color: white;
+      padding: 25px;
+      text-align: center;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 25px auto;
+      padding: 15px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px #00000010;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .summary .card {
+      text-align: center;
+    }
+
+    .number {
+      font-size: 26px;
+      font-weight: bold;
+      color: #2563eb;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 7px 0 15px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+    }
+
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 11px 16px;
+      border-radius: 7px;
+      cursor: pointer;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .bar {
+      background: #dbeafe;
+      height: 18px;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 8px 0 15px;
+    }
+
+    .fill {
+      background: #3b82f6;
+      height: 100%;
+    }
+
+    @media (max-width: 600px) {
+      .summary {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Student Performance Analyzer</h1>
+    <p>Analyze student marks easily</p>
+  </header>
+
+  <main>
+    <section class="summary">
+      <div class="card">
+        <h3>Students</h3>
+        <div class="number" id="count">0</div>
+      </div>
+
+      <div class="card">
+        <h3>Average Mark</h3>
+        <div class="number" id="average">0</div>
+      </div>
+
+      <div class="card">
+        <h3>Highest Mark</h3>
+        <div class="number" id="highest">0</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Add Student</h2>
+
+      <form id="studentForm">
+        <label for="name">Student Name</label>
+        <input id="name" required placeholder="Enter student name">
+
+        <label for="subject">Subject</label>
+        <input id="subject" required placeholder="Enter subject">
+
+        <label for="mark">Mark (0–100)</label>
+        <input id="mark" type="number" min="0" max="100"
+               required placeholder="Enter mark">
+
+        <button type="submit">Add Student</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Performance Chart</h2>
+      <div id="chart">No student data yet.</div>
+    </section>
+
+    <section class="card">
+      <h2>Student Records</h2>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Subject</th>
+              <th>Mark</th>
+              <th>Result</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="records"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+<script>
+const form = document.getElementById("studentForm");
+const records = document.getElementById("records");
+const chart = document.getElementById("chart");
+
+let students = [
+  { name: "Anu", subject: "Maths", mark: 85 },
+  { name: "Rahul", subject: "Science", mark: 72 },
+  { name: "Maya", subject: "English", mark: 94 }
+];
+
+function updateDashboard() {
+  document.getElementById("count").textContent =
+    students.length;
+
+  const marks = students.map(student => student.mark);
+
+  const average = marks.length
+    ? marks.reduce((total, mark) => total + mark, 0) / marks.length
+    : 0;
+
+  document.getElementById("average").textContent =
+    average.toFixed(1);
+
+  document.getElementById("highest").textContent =
+    marks.length ? Math.max(...marks) : 0;
+
+  records.innerHTML = "";
+  chart.innerHTML = "";
+
+  students.forEach((student, index) => {
+    const result = student.mark >= 50 ? "Pass" : "Needs practice";
+
+    const row = document.createElement("tr");
+
+    [student.name, student.subject, student.mark, result].forEach(value => {
+      const cell = document.createElement("td");
+      cell.textContent = value;
+      row.appendChild(cell);
+    });
+
+    const actionCell = document.createElement("td");
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete";
+
+    deleteButton.onclick = () => {
+      students.splice(index, 1);
+      updateDashboard();
+    };
+
+    actionCell.appendChild(deleteButton);
+    row.appendChild(actionCell);
+    records.appendChild(row);
+
+    const label = document.createElement("p");
+    label.textContent = student.name + " — " + student.mark + "%";
+    chart.appendChild(label);
+
+    const bar = document.createElement("div");
+    bar.className = "bar";
+
+    const fill = document.createElement("div");
+    fill.className = "fill";
+    fill.style.width = student.mark + "%";
+
+    bar.appendChild(fill);
+    chart.appendChild(bar);
+  });
+
+  if (students.length === 0) {
+    chart.textContent = "No student data yet.";
+  }
+}
+
+form.addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  const name = document.getElementById("name").value.trim();
+  const subject = document.getElementById("subject").value.trim();
+  const mark = Number(document.getElementById("mark").value);
+
+  if (!name || !subject || mark < 0 || mark > 100) {
+    alert("Please enter valid student details and marks from 0 to 100.");
+    return;
+  }
+
+  students.push({ name, subject, mark });
+
+  form.reset();
+  updateDashboard();
+});
+
+updateDashboard();
+</script>
+</body>
+</html>
